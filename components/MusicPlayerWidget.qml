@@ -87,7 +87,7 @@ Item {
                         }
                     }
 
-                    // Индикатор воспроизведения
+                    // Индикатор статуса воспроизведения (только отображение, без кнопки)
                     Rectangle {
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
@@ -98,13 +98,13 @@ Item {
                         color: vehicleData && vehicleData.isPlaying ? "#4CAF50" : "#FF9800"
                         border.color: "white"
                         border.width: 2
-                        visible: vehicleData && vehicleData.isPlaying
 
-                        Text {
+                        Image {
                             anchors.centerIn: parent
-                            text: "▶"
-                            font.pixelSize: 14
-                            color: "white"
+                            width: 18
+                            height: 18
+                            source: vehicleData && vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
+                            fillMode: Image.PreserveAspectFit
                         }
 
                         SequentialAnimation on opacity {
@@ -188,85 +188,6 @@ Item {
                         text: formatTime(vehicleData ? vehicleData.trackTotalTime : 0)
                         font.pixelSize: 12
                         color: "#AAAAAA"
-                    }
-                }
-            }
-
-            // Кнопки управления
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: 30
-
-                // Кнопка перемотки назад
-                Button {
-                    background: Rectangle {
-                        color: parent.pressed ? "#00E0FF" : "transparent"
-                        radius: width/2
-                        opacity: parent.pressed ? 0.3 : 1.0
-                    }
-                    contentItem: Image {
-                        source: "qrc:/image/Rewind.png"
-                        width: 64
-                        height: 64
-                        fillMode: Image.PreserveAspectFit
-                        anchors.centerIn: parent
-                    }
-                    Layout.preferredWidth: 64
-                    Layout.preferredHeight: 64
-                    onClicked: {
-                        // Здесь можно добавить логику перемотки назад
-                        if (vehicleData) {
-                            var newTime = Math.max(0, vehicleData.trackCurrentTime - 10)
-                            vehicleData.trackCurrentTime = newTime
-                        }
-                    }
-                }
-
-                // Кнопка воспроизведения
-                Button {
-                    background: Rectangle {
-                        color: parent.pressed ? "#00E0FF" : "transparent"
-                        radius: width/2
-                        opacity: parent.pressed ? 0.3 : 1.0
-                    }
-                    contentItem: Image {
-                        source: vehicleData && vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
-                        width: 68
-                        height: 68
-                        fillMode: Image.PreserveAspectFit
-                        anchors.centerIn: parent
-                    }
-                    Layout.preferredWidth: 68
-                    Layout.preferredHeight: 68
-                    onClicked: {
-                        if (vehicleData) {
-                            vehicleData.isPlaying = !vehicleData.isPlaying
-                        }
-                    }
-                }
-
-                // Кнопка перемотки вперед
-                Button {
-                    background: Rectangle {
-                        color: parent.pressed ? "#00E0FF" : "transparent"
-                        radius: width/2
-                        opacity: parent.pressed ? 0.3 : 1.0
-                    }
-                    contentItem: Image {
-                        source: "qrc:/image/FastFwd.png"
-                        width: 64
-                        height: 64
-                        fillMode: Image.PreserveAspectFit
-                        anchors.centerIn: parent
-                    }
-                    Layout.preferredWidth: 64
-                    Layout.preferredHeight: 64
-                    onClicked: {
-                        // Здесь можно добавить логику перемотки вперед
-                        if (vehicleData) {
-                            var newTime = Math.min(vehicleData.trackTotalTime, vehicleData.trackCurrentTime + 10)
-                            vehicleData.trackCurrentTime = newTime
-                        }
                     }
                 }
             }
