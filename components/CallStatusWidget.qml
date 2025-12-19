@@ -5,7 +5,39 @@ import QtQuick.Layouts 1.15
 Item {
     id: callWidget
 
-    property var callData: null
+    // Функция форматирования времени
+    function formatTime(seconds) {
+        if (seconds < 0) seconds = 0
+        var hours = Math.floor(seconds / 3600)
+        var mins = Math.floor((seconds % 3600) / 60)
+        var secs = seconds % 60
+        
+        if (hours > 0) {
+            return hours + ":" + (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs)
+        } else {
+            return mins + ":" + (secs < 10 ? "0" + secs : secs)
+        }
+    }
+
+    // Получаем статус звонка
+    property int callStatus: vehicleData ? vehicleData.callStatus : 0 // 0: NoCall
+    property bool hasActiveCall: callStatus === 1 || callStatus === 2 || callStatus === 3 // Incoming, Outgoing, Active
+    property bool isIncoming: callStatus === 1
+    property bool isOutgoing: callStatus === 2
+    property bool isActive: callStatus === 3
+
+    // Timer для отсчета длительности активного звонка
+    Timer {
+        id: callDurationTimer
+        interval: 1000
+        running: isActive && vehicleData
+        repeat: true
+        onTriggered: {
+            if (vehicleData) {
+                vehicleData.callDuration = vehicleData.callDuration + 1
+            }
+        }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -34,11 +66,69 @@ Item {
                 Layout.fillWidth: true
                 spacing: 10
 
+                // Иконка статуса (крупная)
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 100
+                    Layout.alignment: Qt.AlignHCenter
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 80
+                        height: 80
+                        radius: 40
+                        color: {
+                            if (isIncoming) return "#00E0FF"
+                            if (isOutgoing) return "#00E0FF"
+                            if (isActive) return "#4CAF50"
+                            return "#666666"
+                        }
+                        border.color: "white"
+                        border.width: 3
+                        opacity: hasActiveCall ? 1.0 : 0.3
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: {
+                                if (isIncoming) return "📞"
+                                if (isOutgoing) return "📲"
+                                if (isActive) return "📱"
+                                return "📵"
+                            }
+                            font.pixelSize: 40
+                        }
+
+                        // Анимация для входящего/исходящего звонка
+                        SequentialAnimation on scale {
+                            running: (isIncoming || isOutgoing) && hasActiveCall
+                            loops: Animation.Infinite
+                            NumberAnimation { to: 1.2; duration: 500; easing.type: Easing.InOutQuad }
+                            NumberAnimation { to: 1.0; duration: 500; easing.type: Easing.InOutQuad }
+                        }
+
+                        SequentialAnimation on opacity {
+                            running: (isIncoming || isOutgoing) && hasActiveCall
+                            loops: Animation.Infinite
+                            NumberAnimation { to: 0.6; duration: 500; easing.type: Easing.InOutQuad }
+                            NumberAnimation { to: 1.0; duration: 500; easing.type: Easing.InOutQuad }
+                        }
+                    }
+                }
+
                 // Имя контакта/номера
                 Text {
-                    text: callData ? callData.contactName : "No active call"
+                    text: {
+                        if (!vehicleData) return "No active call"
+                        if (vehicleData.callerName && vehicleData.callerName.length > 0) {
+                            return vehicleData.callerName
+                        }
+                        if (vehicleData.callerNumber && vehicleData.callerNumber.length > 0) {
+                            return vehicleData.callerNumber
+                        }
+                        return "Unknown"
+                    }
                     font {
-                        pixelSize: 22
+                        pixelSize: 24
                         family: "Roboto"
                         weight: Font.Bold
                     }
@@ -49,79 +139,83 @@ Item {
                     Layout.maximumWidth: parent.width
                 }
 
+                // Номер телефона (если есть имя)
+                Text {
+                    visible: vehicleData && vehicleData.callerName && vehicleData.callerName.length > 0 && 
+                             vehicleData.callerNumber && vehicleData.callerNumber.length > 0
+                    text: vehicleData ? vehicleData.callerNumber : ""
+                    font.pixelSize: 16
+                    color: "#AAAAAA"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
                 // Статус звонка
                 Text {
                     text: {
-                        if (!callData) return ""
-                        switch(callData.status) {
-                            case "incoming": return "Incoming call"
-                            case "outgoing": return "Calling..."
-                            case "active": return "Call in progress"
-                            case "ended": return "Call ended"
-                            case "missed": return "Missed call"
-                            case "rejected": return "Call rejected"
-                            default: return callData.status
+                        if (!vehicleData) return ""
+                        switch(callStatus) {
+                            case 1: return "Входящий звонок"
+                            case 2: return "Исходящий звонок..."
+                            case 3: return "Разговор"
+                            case 4: return "Звонок завершен"
+                            case 5: return "Пропущенный звонок"
+                            case 6: return "Звонок отклонен"
+                            default: return "Нет активных звонков"
                         }
                     }
                     font.pixelSize: 16
                     color: {
-                        if (!callData) return "gray"
-                        switch(callData.status) {
-                            case "incoming": return "#00E0FF"
-                            case "outgoing": return "#00E0FF"
-                            case "active": return "#4CAF50"
-                            case "ended": return "gray"
-                            case "missed": return "#FF5555"
-                            case "rejected": return "#FF9800"
-                            default: return "white"
-                        }
+                        if (isIncoming || isOutgoing) return "#00E0FF"
+                        if (isActive) return "#4CAF50"
+                        if (callStatus === 5) return "#FF5555"
+                        if (callStatus === 6) return "#FF9800"
+                        return "#AAAAAA"
                     }
                     Layout.alignment: Qt.AlignHCenter
                 }
 
                 // Длительность звонка
                 Text {
-                    visible: callData && (callData.status === "active" || callData.status === "ended")
-                    text: {
-                        if (!callData) return ""
-                        var secs = callData.duration % 60
-                        var mins = Math.floor(callData.duration / 60)
-                        return mins + ":" + (secs < 10 ? "0" + secs : secs)
+                    visible: isActive && vehicleData
+                    text: formatTime(vehicleData ? vehicleData.callDuration : 0)
+                    font {
+                        pixelSize: 20
+                        family: "Roboto"
+                        weight: Font.Bold
                     }
-                    font.pixelSize: 14
-                    color: "#AAAAAA"
+                    color: "#4CAF50"
                     Layout.alignment: Qt.AlignHCenter
                 }
             }
 
-            // Анимация звонка
+            // Анимация звонка (пульсация)
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 60
-                visible: callData && (callData.status === "incoming" || callData.status === "outgoing")
+                Layout.preferredHeight: 40
+                visible: (isIncoming || isOutgoing) && hasActiveCall
 
                 Row {
                     anchors.centerIn: parent
-                    spacing: 15
+                    spacing: 12
 
                     Repeater {
                         model: 3
 
                         Rectangle {
-                            width: 15
-                            height: 15
-                            radius: width/2
+                            width: 12
+                            height: 12
+                            radius: 6
                             color: "#00E0FF"
 
                             SequentialAnimation on opacity {
-                                running: callWidget.visible
+                                running: (isIncoming || isOutgoing) && hasActiveCall
                                 loops: Animation.Infinite
                                 NumberAnimation { from: 0.3; to: 1.0; duration: 1000; easing.type: Easing.InOutQuad }
                                 PauseAnimation { duration: index * 200 }
                             }
 
                             SequentialAnimation on scale {
-                                running: callWidget.visible
+                                running: (isIncoming || isOutgoing) && hasActiveCall
                                 loops: Animation.Infinite
                                 NumberAnimation { from: 0.8; to: 1.2; duration: 1000; easing.type: Easing.InOutQuad }
                                 PauseAnimation { duration: index * 200 }
@@ -131,39 +225,125 @@ Item {
                 }
             }
 
-            // Иконка статуса
-            Item {
+            // Кнопки управления звонком
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 80
                 Layout.alignment: Qt.AlignHCenter
+                spacing: 15
+                visible: hasActiveCall
 
-                Image {
-                    id: statusIcon
-                    anchors.centerIn: parent
-                    width: 60
-                    height: 60
-                    source: {
-                        if (!callData) return ""
-                        switch(callData.status) {
-                            case "incoming": return "qrc:/images/call_incoming.png"
-                            case "outgoing": return "qrc:/images/call_outgoing.png"
-                            case "active": return "qrc:/images/call_active.png"
-                            case "ended": return "qrc:/images/call_ended.png"
-                            case "missed": return "qrc:/images/call_missed.png"
-                            case "rejected": return "qrc:/images/call_rejected.png"
-                            default: return ""
+                // Кнопка "Ответить" (только для входящего)
+                Button {
+                    visible: isIncoming
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.darker("#4CAF50", 1.2) : "#4CAF50"
+                        radius: 40
+                        border.color: "white"
+                        border.width: 2
+                    }
+                    contentItem: Text {
+                        text: "✓"
+                        font.pixelSize: 32
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    onClicked: {
+                        if (vehicleData) {
+                            vehicleData.callStatus = 3 // ActiveCall
+                            vehicleData.callDuration = 0 // Сброс таймера
                         }
                     }
-                    fillMode: Image.PreserveAspectFit
+                }
 
-                    RotationAnimation on rotation {
-                        running: callData && callData.status === "active"
-                        from: 0
-                        to: 360
-                        duration: 8000
-                        loops: Animation.Infinite
+                // Кнопка "Отклонить" (только для входящего)
+                Button {
+                    visible: isIncoming
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.darker("#F44336", 1.2) : "#F44336"
+                        radius: 40
+                        border.color: "white"
+                        border.width: 2
+                    }
+                    contentItem: Text {
+                        text: "✕"
+                        font.pixelSize: 32
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    onClicked: {
+                        if (vehicleData) {
+                            vehicleData.callStatus = 6 // CallRejected
+                            vehicleData.callDuration = 0
+                        }
                     }
                 }
+
+                // Кнопка "Завершить" (для активного или исходящего)
+                Button {
+                    visible: isActive || isOutgoing
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.darker("#F44336", 1.2) : "#F44336"
+                        radius: 40
+                        border.color: "white"
+                        border.width: 2
+                    }
+                    contentItem: Text {
+                        text: "✕"
+                        font.pixelSize: 32
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    onClicked: {
+                        if (vehicleData) {
+                            if (isActive) {
+                                vehicleData.callStatus = 4 // CallEnded
+                            } else {
+                                vehicleData.callStatus = 0 // NoCall
+                            }
+                            vehicleData.callDuration = 0
+                        }
+                    }
+                }
+
+                // Кнопка "Удержать" (только для активного)
+                Button {
+                    visible: isActive
+                    Layout.preferredWidth: 60
+                    Layout.preferredHeight: 60
+                    background: Rectangle {
+                        color: parent.pressed ? Qt.darker("#FF9800", 1.2) : "#FF9800"
+                        radius: 30
+                        border.color: "white"
+                        border.width: 2
+                    }
+                    contentItem: Text {
+                        text: "⏸"
+                        font.pixelSize: 24
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+                    onClicked: {
+                        // Здесь можно добавить логику удержания звонка
+                        // Пока просто логируем
+                        console.log("Call on hold")
+                    }
+                }
+            }
+
+            // Сообщение когда нет звонка
+            Text {
+                visible: !hasActiveCall
+                text: "Нет активных звонков"
+                font.pixelSize: 16
+                color: "#666666"
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillHeight: true
             }
         }
     }

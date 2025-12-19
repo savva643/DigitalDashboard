@@ -116,15 +116,16 @@ ApplicationWindow {
     ScrollView {
         anchors.fill: parent
         clip: true
+        contentWidth: contentColumn.width
+        contentHeight: contentColumn.height
 
         // Custom scrollbar styling
         ScrollBar.vertical: ScrollBar {
             id: verticalScrollBar
             active: true
             orientation: Qt.Vertical
-            size: 0
-            width: 0
             policy: ScrollBar.AsNeeded
+            width: 12
 
             contentItem: Rectangle {
                 implicitWidth: 8
@@ -152,7 +153,7 @@ ApplicationWindow {
                 implicitHeight: 100
                 color: "#2D3748"
                 radius: 4
-                opacity: 0
+                opacity: 0.3
 
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
@@ -161,14 +162,15 @@ ApplicationWindow {
         ScrollBar.horizontal: ScrollBar {
             policy: ScrollBar.AlwaysOff
         }
+        
         Column {
+            id: contentColumn
+            width: debugWindow.width - 12
 
-         width: debugWindow.width
-
-        Column {
-            width:  parent.width - 24
-            spacing: 16
-            anchors.horizontalCenter: parent.horizontalCenter // Добавляем это
+            Column {
+                width: parent.width - 24
+                spacing: 16
+                anchors.horizontalCenter: parent.horizontalCenter
 
             Rectangle {
                 width: parent.width
@@ -2555,12 +2557,323 @@ ApplicationWindow {
                 }
             }
 
+            // Widget Function Selection Card
+            Rectangle {
+                width: parent.width
+                height: widgetFunctionColumn.height + 32
+                color: cardColor
+                radius: 12
+
+                Column {
+                    id: widgetFunctionColumn
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 16
+                    spacing: 12
+
+                    Text {
+                        text: "🎛️ Widget Function Selection"
+                        font.pixelSize: 16
+                        font.weight: Font.Bold
+                        color: accentColor
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: "#404040"
+                    }
+
+                    Text {
+                        text: "Select which function to display in each widget slot of the central display:"
+                        font.pixelSize: 11
+                        color: "#B0B0B0"
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                    }
+
+                    // Widget Slot 1 (Gear Widget)
+                    Rectangle {
+                        width: parent.width
+                        height: widgetSlot1Column.height + 16
+                        radius: 8
+                        color: "#1A1A1A"
+                        border.color: "#404040"
+                        border.width: 1
+
+                        Column {
+                            id: widgetSlot1Column
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            spacing: 8
+
+                            Text {
+                                text: "Slot 1: Gear Widget"
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                                color: "white"
+                            }
+
+                            ComboBox {
+                                width: parent.width
+                                model: ["Gear Display", "Navigation Info", "Call Status", "Music Player"]
+                                currentIndex: 0
+                                font.pixelSize: 11
+                            }
+                        }
+                    }
+
+                    // Widget Slot 2 (Music Widget)
+                    Rectangle {
+                        width: parent.width
+                        height: widgetSlot2Column.height + 16
+                        radius: 8
+                        color: "#1A1A1A"
+                        border.color: "#404040"
+                        border.width: 1
+
+                        Column {
+                            id: widgetSlot2Column
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            spacing: 8
+
+                            Text {
+                                text: "Slot 2: Music Widget"
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                                color: "white"
+                            }
+
+                            ComboBox {
+                                id: musicWidgetFunction
+                                width: parent.width
+                                model: ["Music Player", "Call Status", "Navigation Info", "Gear Display"]
+                                currentIndex: 0
+                                font.pixelSize: 11
+                                
+                                onCurrentIndexChanged: {
+                                    // Здесь можно добавить логику переключения функций виджета
+                                    console.log("Music Widget function changed to:", model[currentIndex])
+                                }
+                            }
+                        }
+                    }
+
+                    // Widget Slot 3 (Doors Widget)
+                    Rectangle {
+                        width: parent.width
+                        height: widgetSlot3Column.height + 16
+                        radius: 8
+                        color: "#1A1A1A"
+                        border.color: "#404040"
+                        border.width: 1
+
+                        Column {
+                            id: widgetSlot3Column
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            spacing: 8
+
+                            Text {
+                                text: "Slot 3: Doors Widget"
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                                color: "white"
+                            }
+
+                            ComboBox {
+                                id: doorsWidgetFunction
+                                width: parent.width
+                                model: ["Car Doors Status", "Call Status", "Music Player", "Navigation Info"]
+                                currentIndex: 0
+                                font.pixelSize: 11
+                                
+                                onCurrentIndexChanged: {
+                                    console.log("Doors Widget function changed to:", model[currentIndex])
+                                }
+                            }
+                        }
+                    }
+
+                    // Widget Slot 4 (Call Widget)
+                    Rectangle {
+                        width: parent.width
+                        height: widgetSlot4Column.height + 16
+                        radius: 8
+                        color: "#1A1A1A"
+                        border.color: "#404040"
+                        border.width: 1
+
+                        Column {
+                            id: widgetSlot4Column
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            spacing: 8
+
+                            Text {
+                                text: "Slot 4: Call Widget"
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                                color: "white"
+                            }
+
+                            ComboBox {
+                                id: callWidgetFunction
+                                width: parent.width
+                                model: ["Call Status", "Music Player", "Navigation Info", "Gear Display"]
+                                currentIndex: 0
+                                font.pixelSize: 11
+                                
+                                onCurrentIndexChanged: {
+                                    console.log("Call Widget function changed to:", model[currentIndex])
+                                    // Пример: если выбран Music Player, можно обновить данные
+                                    if (currentIndex === 1 && vehicleData) {
+                                        // Можно автоматически заполнить данные музыки для тестирования
+                                    }
+                                }
+                            }
+
+                            // Дополнительные настройки для Call Widget
+                            Row {
+                                width: parent.width
+                                spacing: 8
+                                visible: callWidgetFunction.currentIndex === 0
+
+                                Text {
+                                    text: "Test Call:"
+                                    font.pixelSize: 10
+                                    color: "#B0B0B0"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Button {
+                                    text: "Incoming"
+                                    font.pixelSize: 9
+                                    height: 24
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.callStatus = 1 // IncomingCall
+                                            vehicleData.callerName = "Test Contact"
+                                            vehicleData.callerNumber = "+7 (999) 123-45-67"
+                                        }
+                                    }
+                                }
+
+                                Button {
+                                    text: "Active"
+                                    font.pixelSize: 9
+                                    height: 24
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.callStatus = 3 // ActiveCall
+                                            vehicleData.callerName = "Test Contact"
+                                            vehicleData.callerNumber = "+7 (999) 123-45-67"
+                                        }
+                                    }
+                                }
+
+                                Button {
+                                    text: "End"
+                                    font.pixelSize: 9
+                                    height: 24
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.callStatus = 0 // NoCall
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Quick Actions
+                    Rectangle {
+                        width: parent.width
+                        height: quickActionsColumn.height + 16
+                        radius: 8
+                        color: "#1A1A1A"
+                        border.color: accentColor
+                        border.width: 1
+
+                        Column {
+                            id: quickActionsColumn
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            spacing: 8
+
+                            Text {
+                                text: "⚡ Quick Actions"
+                                font.pixelSize: 12
+                                font.weight: Font.Bold
+                                color: accentColor
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: 8
+
+                                Button {
+                                    text: "Test Music"
+                                    font.pixelSize: 9
+                                    height: 28
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.currentTrack = "Test Track"
+                                            vehicleData.currentArtist = "Test Artist"
+                                            vehicleData.currentAlbum = "Test Album"
+                                            vehicleData.isPlaying = true
+                                        }
+                                    }
+                                }
+
+                                Button {
+                                    text: "Test Call"
+                                    font.pixelSize: 9
+                                    height: 28
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.callStatus = 1 // IncomingCall
+                                            vehicleData.callerName = "John Doe"
+                                            vehicleData.callerNumber = "+7 (999) 123-45-67"
+                                        }
+                                    }
+                                }
+
+                                Button {
+                                    text: "Test Nav"
+                                    font.pixelSize: 9
+                                    height: 28
+                                    onClicked: {
+                                        if (vehicleData) {
+                                            vehicleData.navigationDistance = 2.5
+                                            vehicleData.navigationAngle = 90
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Media & Phone Card
-                        Rectangle {
-                            width: parent.width
-                            height: mediaColumn.height + 32
-                            color: cardColor
-                            radius: 12
+            Rectangle {
+                width: parent.width
+                height: mediaColumn.height + 32
+                color: cardColor
+                radius: 12
 
                             Column {
                                 id: mediaColumn

@@ -60,6 +60,14 @@ bool VehicleData::isPlaying() const {
     return m_isPlaying;
 }
 
+int VehicleData::trackCurrentTime() const {
+    return m_trackCurrentTime;
+}
+
+int VehicleData::trackTotalTime() const {
+    return m_trackTotalTime;
+}
+
 // Call related getters
 VehicleData::CallStatus VehicleData::callStatus() const {
     return m_callStatus;
@@ -395,6 +403,20 @@ void VehicleData::setIsPlaying(bool playing) {
     if (m_isPlaying != playing) {
         m_isPlaying = playing;
         emit isPlayingChanged();
+    }
+}
+
+void VehicleData::setTrackCurrentTime(int time) {
+    if (m_trackCurrentTime != time) {
+        m_trackCurrentTime = time;
+        emit trackCurrentTimeChanged();
+    }
+}
+
+void VehicleData::setTrackTotalTime(int time) {
+    if (m_trackTotalTime != time) {
+        m_trackTotalTime = time;
+        emit trackTotalTimeChanged();
     }
 }
 

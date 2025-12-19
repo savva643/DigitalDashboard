@@ -8,6 +8,20 @@ Item {
     width: 440
     height: 600
 
+    // Функция форматирования времени
+    function formatTime(seconds) {
+        if (seconds < 0) seconds = 0
+        var mins = Math.floor(seconds / 60)
+        var secs = seconds % 60
+        return mins + ":" + (secs < 10 ? "0" + secs : secs)
+    }
+
+    // Вычисляем прогресс (0.0 - 1.0)
+    property real progress: {
+        if (!vehicleData || vehicleData.trackTotalTime <= 0) return 0.0
+        return Math.min(vehicleData.trackCurrentTime / vehicleData.trackTotalTime, 1.0)
+    }
+
     Rectangle {
         id: background
         anchors.fill: parent
@@ -35,45 +49,105 @@ Item {
 
                 // Обложка альбома
                 Rectangle {
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: 80
+                    Layout.preferredWidth: 120
+                    Layout.preferredHeight: 120
                     radius: 12
                     color: "#252A31"
                     clip: true
+                    border.color: "#00E0FF"
+                    border.width: 2
 
                     Image {
                         id: albumCover
                         anchors.fill: parent
-                        source: "qrc:/image/music.jpg"
+                        anchors.margins: 2
+                        source: vehicleData && vehicleData.albumArt ? vehicleData.albumArt : "qrc:/image/music.jpg"
                         fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        
                         onStatusChanged: {
-                            if (status === Image.Error) {
-                                console.log("Ошибка загрузки изображения");
+                            if (status === Image.Error || status === Image.Null) {
                                 source = "qrc:/image/music.jpg" // Запасное изображение
                             }
+                        }
+
+                        // Плейсхолдер при загрузке
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#252A31"
+                            visible: albumCover.status === Image.Loading
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "♪"
+                                font.pixelSize: 40
+                                color: "#00E0FF"
+                                opacity: 0.5
+                            }
+                        }
+                    }
+
+                    // Индикатор воспроизведения
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        anchors.margins: 8
+                        width: 32
+                        height: 32
+                        radius: 16
+                        color: vehicleData && vehicleData.isPlaying ? "#4CAF50" : "#FF9800"
+                        border.color: "white"
+                        border.width: 2
+                        visible: vehicleData && vehicleData.isPlaying
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "▶"
+                            font.pixelSize: 14
+                            color: "white"
+                        }
+
+                        SequentialAnimation on opacity {
+                            running: vehicleData && vehicleData.isPlaying
+                            loops: Animation.Infinite
+                            NumberAnimation { to: 0.5; duration: 1000 }
+                            NumberAnimation { to: 1.0; duration: 1000 }
                         }
                     }
                 }
 
                 // Информация о треке
                 ColumnLayout {
-                    spacing: 10
+                    spacing: 8
+                    Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
 
                     Text {
-                        text: vehicleData.currentTrack
-                        font.pixelSize: 24
+                        text: vehicleData && vehicleData.currentTrack ? vehicleData.currentTrack : "No Track"
+                        font.pixelSize: 22
                         font.bold: true
                         color: "white"
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                        maximumLineCount: 2
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        text: vehicleData && vehicleData.currentArtist ? vehicleData.currentArtist : "Unknown Artist"
+                        font.pixelSize: 16
+                        color: "#00E0FF"
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
 
                     Text {
-                        text: vehicleData.currentArtist
-                        font.pixelSize: 18
-                        color: "#00E0FF"
+                        text: vehicleData && vehicleData.currentAlbum ? vehicleData.currentAlbum : ""
+                        font.pixelSize: 14
+                        color: "#AAAAAA"
                         Layout.fillWidth: true
+                        elide: Text.ElideRight
+                        visible: vehicleData && vehicleData.currentAlbum && vehicleData.currentAlbum.length > 0
                     }
                 }
             }
@@ -90,10 +164,14 @@ Item {
                     color: "#252A31"
 
                     Rectangle {
-                        width: parent.width * 0.4
+                        width: parent.width * progress
                         height: parent.height
                         radius: 3
                         color: "#00E0FF"
+                        
+                        Behavior on width {
+                            NumberAnimation { duration: 200 }
+                        }
                     }
                 }
 
@@ -101,13 +179,13 @@ Item {
                     Layout.fillWidth: true
 
                     Text {
-                        text: "1:15"
+                        text: formatTime(vehicleData ? vehicleData.trackCurrentTime : 0)
                         font.pixelSize: 12
                         color: "#AAAAAA"
                     }
                     Item { Layout.fillWidth: true }
                     Text {
-                        text: "3:20"
+                        text: formatTime(vehicleData ? vehicleData.trackTotalTime : 0)
                         font.pixelSize: 12
                         color: "#AAAAAA"
                     }
@@ -122,8 +200,9 @@ Item {
                 // Кнопка перемотки назад
                 Button {
                     background: Rectangle {
-                        color: "transparent"
+                        color: parent.pressed ? "#00E0FF" : "transparent"
                         radius: width/2
+                        opacity: parent.pressed ? 0.3 : 1.0
                     }
                     contentItem: Image {
                         source: "qrc:/image/Rewind.png"
@@ -134,16 +213,24 @@ Item {
                     }
                     Layout.preferredWidth: 64
                     Layout.preferredHeight: 64
+                    onClicked: {
+                        // Здесь можно добавить логику перемотки назад
+                        if (vehicleData) {
+                            var newTime = Math.max(0, vehicleData.trackCurrentTime - 10)
+                            vehicleData.trackCurrentTime = newTime
+                        }
+                    }
                 }
 
                 // Кнопка воспроизведения
                 Button {
                     background: Rectangle {
-                        color: "transparent"
+                        color: parent.pressed ? "#00E0FF" : "transparent"
                         radius: width/2
+                        opacity: parent.pressed ? 0.3 : 1.0
                     }
                     contentItem: Image {
-                        source: vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
+                        source: vehicleData && vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
                         width: 68
                         height: 68
                         fillMode: Image.PreserveAspectFit
@@ -151,13 +238,19 @@ Item {
                     }
                     Layout.preferredWidth: 68
                     Layout.preferredHeight: 68
+                    onClicked: {
+                        if (vehicleData) {
+                            vehicleData.isPlaying = !vehicleData.isPlaying
+                        }
+                    }
                 }
 
                 // Кнопка перемотки вперед
                 Button {
                     background: Rectangle {
-                        color: "transparent"
+                        color: parent.pressed ? "#00E0FF" : "transparent"
                         radius: width/2
+                        opacity: parent.pressed ? 0.3 : 1.0
                     }
                     contentItem: Image {
                         source: "qrc:/image/FastFwd.png"
@@ -168,6 +261,13 @@ Item {
                     }
                     Layout.preferredWidth: 64
                     Layout.preferredHeight: 64
+                    onClicked: {
+                        // Здесь можно добавить логику перемотки вперед
+                        if (vehicleData) {
+                            var newTime = Math.min(vehicleData.trackTotalTime, vehicleData.trackCurrentTime + 10)
+                            vehicleData.trackCurrentTime = newTime
+                        }
+                    }
                 }
             }
         }

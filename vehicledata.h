@@ -67,6 +67,8 @@ class VehicleData : public QObject {
     Q_PROPERTY(QString currentAlbum READ currentAlbum WRITE setCurrentAlbum NOTIFY currentAlbumChanged)
     Q_PROPERTY(QString albumArt READ albumArt WRITE setAlbumArt NOTIFY albumArtChanged)
     Q_PROPERTY(bool isPlaying READ isPlaying WRITE setIsPlaying NOTIFY isPlayingChanged)
+    Q_PROPERTY(int trackCurrentTime READ trackCurrentTime WRITE setTrackCurrentTime NOTIFY trackCurrentTimeChanged) // в секундах
+    Q_PROPERTY(int trackTotalTime READ trackTotalTime WRITE setTrackTotalTime NOTIFY trackTotalTimeChanged) // в секундах
 
     // Звонки
     Q_PROPERTY(CallStatus callStatus READ callStatus WRITE setCallStatus NOTIFY callStatusChanged)
@@ -142,6 +144,8 @@ public:
     QString currentAlbum() const;
     QString albumArt() const;
     bool isPlaying() const;
+    int trackCurrentTime() const;
+    int trackTotalTime() const;
 
     // Новые геттеры для звонков
     CallStatus callStatus() const;
@@ -154,6 +158,8 @@ public:
     void setCurrentAlbum(const QString &);
     void setAlbumArt(const QString &);
     void setIsPlaying(bool);
+    void setTrackCurrentTime(int);
+    void setTrackTotalTime(int);
 
 
     // Геттеры
@@ -401,6 +407,8 @@ signals:
     void currentAlbumChanged();
     void albumArtChanged();
     void isPlayingChanged();
+    void trackCurrentTimeChanged();
+    void trackTotalTimeChanged();
 
     // Новые сигналы для звонков
     void callStatusChanged();
@@ -506,6 +514,8 @@ private:
     QString m_currentAlbum;
     QString m_albumArt;
     bool m_isPlaying = false;
+    int m_trackCurrentTime = 0;
+    int m_trackTotalTime = 0;
 
     // Новые приватные члены для звонков
     CallStatus m_callStatus = NoCall;
