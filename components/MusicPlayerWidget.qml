@@ -47,27 +47,39 @@ Item {
                 Layout.fillWidth: true
                 spacing: 20
 
-                // Обложка альбома
-                Rectangle {
+                // Обложка альбома (закругленная)
+                Item {
                     Layout.preferredWidth: 120
                     Layout.preferredHeight: 120
-                    radius: 12
-                    color: "#252A31"
-                    clip: true
-                    border.color: "#00E0FF"
-                    border.width: 2
 
-                    Image {
-                        id: albumCover
+                    Rectangle {
+                        id: albumBorder
+                        anchors.fill: parent
+                        radius: 12
+                        color: "transparent"
+                        border.color: "#00E0FF"
+                        border.width: 2
+                    }
+
+                    Rectangle {
+                        id: albumMask
                         anchors.fill: parent
                         anchors.margins: 2
-                        source: vehicleData && vehicleData.albumArt ? vehicleData.albumArt : "qrc:/image/music.jpg"
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        
-                        onStatusChanged: {
-                            if (status === Image.Error || status === Image.Null) {
-                                source = "qrc:/image/music.jpg" // Запасное изображение
+                        radius: 10
+                        color: "#252A31"
+                        clip: true
+
+                        Image {
+                            id: albumCover
+                            anchors.fill: parent
+                            source: vehicleData && vehicleData.albumArt ? vehicleData.albumArt : "qrc:/image/music.jpg"
+                            fillMode: Image.PreserveAspectCrop
+                            asynchronous: true
+                            
+                            onStatusChanged: {
+                                if (status === Image.Error || status === Image.Null) {
+                                    source = "qrc:/image/music.jpg" // Запасное изображение
+                                }
                             }
                         }
 
@@ -86,41 +98,50 @@ Item {
                             }
                         }
                     }
-
-                    // Индикатор статуса воспроизведения (только отображение, без кнопки)
-                    Rectangle {
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        anchors.margins: 8
-                        width: 32
-                        height: 32
-                        radius: 16
-                        color: vehicleData && vehicleData.isPlaying ? "#4CAF50" : "#FF9800"
-                        border.color: "white"
-                        border.width: 2
-
-                        Image {
-                            anchors.centerIn: parent
-                            width: 18
-                            height: 18
-                            source: vehicleData && vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
-                            fillMode: Image.PreserveAspectFit
-                        }
-
-                        SequentialAnimation on opacity {
-                            running: vehicleData && vehicleData.isPlaying
-                            loops: Animation.Infinite
-                            NumberAnimation { to: 0.5; duration: 1000 }
-                            NumberAnimation { to: 1.0; duration: 1000 }
-                        }
-                    }
                 }
 
-                // Информация о треке
+                // Информация о треке и индикатор статуса
                 ColumnLayout {
                     spacing: 8
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
+
+                    // Индикатор статуса воспроизведения (вынесен наружу)
+                    Row {
+                        spacing: 8
+                        Layout.alignment: Qt.AlignLeft
+
+                        Rectangle {
+                            width: 24
+                            height: 24
+                            radius: 12
+                            color: vehicleData && vehicleData.isPlaying ? "#4CAF50" : "#FF9800"
+                            border.color: "white"
+                            border.width: 1.5
+
+                            Image {
+                                anchors.centerIn: parent
+                                width: 14
+                                height: 14
+                                source: vehicleData && vehicleData.isPlaying ? "qrc:/image/Pause.png" : "qrc:/image/Play.png"
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            SequentialAnimation on opacity {
+                                running: vehicleData && vehicleData.isPlaying
+                                loops: Animation.Infinite
+                                NumberAnimation { to: 0.6; duration: 1000 }
+                                NumberAnimation { to: 1.0; duration: 1000 }
+                            }
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: vehicleData && vehicleData.isPlaying ? "Воспроизведение" : "Пауза"
+                            font.pixelSize: 12
+                            color: vehicleData && vehicleData.isPlaying ? "#4CAF50" : "#FF9800"
+                        }
+                    }
 
                     Text {
                         text: vehicleData && vehicleData.currentTrack ? vehicleData.currentTrack : "No Track"
