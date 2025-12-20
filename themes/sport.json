@@ -1,0 +1,129 @@
+{
+  "name": "Sport Theme",
+  "version": "1.0",
+  "description": "Спортивная тема с красными акцентами",
+  
+  "layout": {
+    "refWidth": 1300,
+    "refHeight": 700,
+    "refGaugeSize": 450,
+    "refCenterWidth": 350,
+    "refCenterHeight": 400,
+    "minScale": 0.5
+  },
+  
+  "statusBar": {
+    "enabled": true,
+    "position": "top",
+    "qmlPath": "components/StatusBar.qml",
+    "customProperties": {
+      "backgroundColor": "#0A0A0A"
+    }
+  },
+  
+  "warningIcons": {
+    "enabled": true,
+    "position": "bottom",
+    "qmlPath": "components/WarningIcons.qml"
+  },
+  
+  "centerDisplay": {
+    "enabled": true,
+    "qmlPath": "components/CentralDisplay.qml",
+    "width": 350,
+    "height": 400
+  },
+  
+  "sideGauges": {
+    "left": {
+      "enabled": true,
+      "qmlPath": "components/CircularGauge.qml",
+      "type": "rpm",
+      "width": 450,
+      "height": 450,
+      "properties": {
+        "minValue": 0,
+        "maxValue": 8,
+        "unit": "x1000",
+        "label": "RPM",
+        "accentColor": "#FF3333",
+        "dangerColor": "#FF0000",
+        "dangerThreshold": 0.75
+      },
+      "requiredProperties": ["value"],
+      "dataBinding": "vehicleData.rpm"
+    },
+    "right": {
+      "enabled": true,
+      "qmlPath": "components/CircularGauge.qml",
+      "type": "speed",
+      "width": 450,
+      "height": 450,
+      "properties": {
+        "minValue": 0,
+        "maxValue": 280,
+        "unit": "km/h",
+        "label": "SPEED",
+        "accentColor": "#FF3333",
+        "dangerColor": "#FF0000",
+        "dangerThreshold": 0.9
+      },
+      "requiredProperties": ["value"],
+      "dataBinding": "vehicleData.speed"
+    }
+  },
+  
+  "turnSignals": {
+    "enabled": true,
+    "left": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.leftSignalActive"
+    },
+    "right": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.rightSignalActive"
+    }
+  },
+  
+  "layoutConfig": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 15
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "position": "left",
+      "anchors": {
+        "verticalCenter": true,
+        "right": "centerDisplay",
+        "rightMargin": 20
+      }
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "left": "centerDisplay",
+        "leftMargin": 20
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+

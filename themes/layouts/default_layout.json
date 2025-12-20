@@ -1,0 +1,46 @@
+{
+  "name": "Default Layout",
+  "description": "Стандартное расположение: 3 элемента по центру, статус бар сверху, предупреждения снизу",
+  
+  "elements": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 15
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "position": "left",
+      "anchors": {
+        "verticalCenter": true,
+        "right": "centerDisplay",
+        "rightMargin": 20
+      }
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "left": "centerDisplay",
+        "leftMargin": 20
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+

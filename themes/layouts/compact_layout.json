@@ -1,0 +1,46 @@
+{
+  "name": "Compact Layout",
+  "description": "Компактное расположение: все элементы ближе друг к другу",
+  
+  "elements": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 10
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "position": "left",
+      "anchors": {
+        "verticalCenter": true,
+        "right": "centerDisplay",
+        "rightMargin": 10
+      }
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "left": "centerDisplay",
+        "leftMargin": 10
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+

@@ -1,0 +1,124 @@
+{
+  "name": "Default Theme",
+  "version": "1.0",
+  "description": "Стандартная тема приборной панели",
+  
+  "layout": {
+    "refWidth": 1300,
+    "refHeight": 700,
+    "refGaugeSize": 400,
+    "refCenterWidth": 400,
+    "refCenterHeight": 440,
+    "minScale": 0.5
+  },
+  
+  "statusBar": {
+    "enabled": true,
+    "position": "top",
+    "qmlPath": "components/StatusBar.qml"
+  },
+  
+  "warningIcons": {
+    "enabled": true,
+    "position": "bottom",
+    "qmlPath": "components/WarningIcons.qml"
+  },
+  
+  "centerDisplay": {
+    "enabled": true,
+    "qmlPath": "components/CentralDisplay.qml",
+    "width": 400,
+    "height": 440
+  },
+  
+  "sideGauges": {
+    "left": {
+      "enabled": true,
+      "qmlPath": "components/CircularGauge.qml",
+      "type": "rpm",
+      "width": 400,
+      "height": 400,
+      "properties": {
+        "minValue": 0,
+        "maxValue": 8,
+        "unit": "x1000",
+        "label": "RPM",
+        "accentColor": "#00E0FF",
+        "dangerThreshold": 0.75
+      },
+      "requiredProperties": ["value"],
+      "dataBinding": "vehicleData.rpm"
+    },
+    "right": {
+      "enabled": true,
+      "qmlPath": "components/CircularGauge.qml",
+      "type": "speed",
+      "width": 400,
+      "height": 400,
+      "properties": {
+        "minValue": 0,
+        "maxValue": 220,
+        "unit": "km/h",
+        "label": "SPEED",
+        "accentColor": "#00E0FF",
+        "dangerThreshold": 0.9
+      },
+      "requiredProperties": ["value"],
+      "dataBinding": "vehicleData.speed"
+    }
+  },
+  
+  "turnSignals": {
+    "enabled": true,
+    "left": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.leftSignalActive"
+    },
+    "right": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.rightSignalActive"
+    }
+  },
+  
+  "layoutConfig": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 15
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "position": "left",
+      "anchors": {
+        "verticalCenter": true,
+        "right": "centerDisplay",
+        "rightMargin": 20
+      }
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "left": "centerDisplay",
+        "leftMargin": 20
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+

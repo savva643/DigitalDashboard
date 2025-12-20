@@ -1,0 +1,46 @@
+{
+  "name": "Wide Layout",
+  "description": "Широкое расположение: датчики по краям, центральный дисплей посередине",
+  
+  "elements": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 15
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "position": "left",
+      "anchors": {
+        "verticalCenter": true,
+        "left": true,
+        "leftMargin": 50
+      }
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "right": true,
+        "rightMargin": 50
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+

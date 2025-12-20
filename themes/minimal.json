@@ -1,0 +1,105 @@
+{
+  "name": "Minimal Theme",
+  "version": "1.0",
+  "description": "Минималистичная тема с одним датчиком скорости",
+  
+  "layout": {
+    "refWidth": 1300,
+    "refHeight": 700,
+    "refGaugeSize": 500,
+    "refCenterWidth": 400,
+    "refCenterHeight": 440,
+    "minScale": 0.5
+  },
+  
+  "statusBar": {
+    "enabled": true,
+    "position": "top",
+    "qmlPath": "components/StatusBar.qml"
+  },
+  
+  "warningIcons": {
+    "enabled": true,
+    "position": "bottom",
+    "qmlPath": "components/WarningIcons.qml"
+  },
+  
+  "centerDisplay": {
+    "enabled": true,
+    "qmlPath": "components/CentralDisplay.qml",
+    "width": 400,
+    "height": 440
+  },
+  
+  "sideGauges": {
+    "left": {
+      "enabled": false
+    },
+    "right": {
+      "enabled": true,
+      "qmlPath": "components/CircularGauge.qml",
+      "type": "speed",
+      "width": 500,
+      "height": 500,
+      "properties": {
+        "minValue": 0,
+        "maxValue": 220,
+        "unit": "km/h",
+        "label": "SPEED",
+        "accentColor": "#00E0FF",
+        "dangerThreshold": 0.9
+      },
+      "requiredProperties": ["value"],
+      "dataBinding": "vehicleData.speed"
+    }
+  },
+  
+  "turnSignals": {
+    "enabled": true,
+    "left": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.leftSignalActive"
+    },
+    "right": {
+      "qmlPath": "components/TurnSignal.qml",
+      "dataBinding": "vehicleData.rightSignalActive"
+    }
+  },
+  
+  "layoutConfig": {
+    "statusBar": {
+      "position": "top",
+      "anchors": {
+        "top": true,
+        "left": true,
+        "right": true,
+        "margins": 15
+      }
+    },
+    "centerDisplay": {
+      "position": "center",
+      "anchors": {
+        "centerIn": "parent"
+      }
+    },
+    "leftGauge": {
+      "enabled": false
+    },
+    "rightGauge": {
+      "position": "right",
+      "anchors": {
+        "verticalCenter": true,
+        "right": true,
+        "rightMargin": 50
+      }
+    },
+    "warningIcons": {
+      "position": "bottom",
+      "anchors": {
+        "bottom": true,
+        "horizontalCenter": true
+      }
+    }
+  }
+}
+
