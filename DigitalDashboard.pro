@@ -11,13 +11,11 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    vehicledata.cpp \
-    thememanager.cpp
+    vehicledata.cpp
 
 HEADERS += \
     mainwindow.h \
-    vehicledata.h \
-    thememanager.h
+    vehicledata.h
 
 FORMS += \
     mainwindow.ui
