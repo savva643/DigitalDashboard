@@ -59,5 +59,6 @@
         <file>image/car_doors_fr.png</file>
         <file>image/car_base.png</file>
         <file>image/car_doors_fl.png</file>
+        <file>components/DashboardConstructor.qml</file>
     </qresource>
 </RCC>

@@ -8,12 +8,37 @@ ApplicationWindow {
     width: 420
     height: 800
     title: qsTr("Vehicle Debug Panel")
+    
+    property var vehicleData: null
+    property var dashboard: null
+    property var constructorWindow: null
 
     Material.theme: Material.Dark
     Material.primary: Material.Blue
+    
+    // Функция открытия конструктора
+    function openConstructor() {
+        if (!constructorWindow) {
+            var component = Qt.createComponent("components/DashboardConstructor.qml");
+            if (component.status === Component.Ready) {
+                constructorWindow = component.createObject(debugWindow, {
+                    "vehicleData": vehicleData,
+                    "dashboard": dashboard
+                });
+                constructorWindow.closing.connect(function() {
+                    constructorWindow.destroy();
+                    constructorWindow = null;
+                });
+            } else {
+                console.error("Error loading constructor:", component.errorString());
+            }
+        } else {
+            constructorWindow.raise();
+            constructorWindow.requestActivate();
+        }
+    }
     Material.accent: Material.Cyan
 
-    property var vehicleData
 
     // Custom colors
     readonly property color primaryColor: "#0D47A1"
@@ -3413,6 +3438,19 @@ ApplicationWindow {
                                 }
                             }
                         }
+
+            // Кнопка открытия конструктора
+            Button {
+                text: "Открыть конструктор"
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 40
+                height: 50
+                Material.background: Material.Blue
+                Material.foreground: "white"
+                font.pixelSize: 16
+                font.bold: true
+                onClicked: openConstructor()
+            }
 
             // System Status Card
             Rectangle {
